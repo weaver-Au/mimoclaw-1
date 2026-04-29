@@ -52,8 +52,12 @@ public class AdminController {
     }
 
     @GetMapping("/users/edit/{id}")
-    public String userEditForm(@PathVariable Long id, Model model) {
+    public String userEditForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
         User user = userService.findById(id);
+        if (user == null) {
+            ra.addFlashAttribute("error", "用户不存在");
+            return "redirect:/admin/users";
+        }
         model.addAttribute("user", user);
         return "admin/user-form";
     }
@@ -75,6 +79,10 @@ public class AdminController {
             // Existing user - if password is empty, keep old password
             if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
                 User existing = userService.findById(user.getId());
+                if (existing == null) {
+                    ra.addFlashAttribute("error", "用户不存在");
+                    return "redirect:/admin/users";
+                }
                 user.setPassword(existing.getPassword());
             }
             userService.update(user);

@@ -52,9 +52,13 @@ public class PaperController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, HttpSession session, Model model) {
+    public String editForm(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         User user = (User) session.getAttribute("loginUser");
         Paper paper = paperService.findByIdWithQuestions(id);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/teacher/papers";
+        }
         model.addAttribute("paper", paper);
         model.addAttribute("courses", courseService.findByTeacherId(user.getId()));
         return "teacher/paper-form";
@@ -97,6 +101,10 @@ public class PaperController {
                                @RequestParam(required = false) Integer difficulty,
                                RedirectAttributes ra) {
         Paper paper = paperService.findById(id);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/teacher/papers";
+        }
         List<Question> allQ = questionService.findByCourseId(paper.getCourseId());
 
         // Filter by difficulty if specified

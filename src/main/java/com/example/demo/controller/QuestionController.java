@@ -46,9 +46,14 @@ public class QuestionController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, HttpSession session, Model model) {
+    public String editForm(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         User user = (User) session.getAttribute("loginUser");
-        model.addAttribute("question", questionService.findById(id));
+        Question question = questionService.findById(id);
+        if (question == null) {
+            ra.addFlashAttribute("error", "试题不存在");
+            return "redirect:/teacher/questions";
+        }
+        model.addAttribute("question", question);
         model.addAttribute("courses", courseService.findByTeacherId(user.getId()));
         return "teacher/question-form";
     }

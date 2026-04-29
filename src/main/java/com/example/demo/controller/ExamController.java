@@ -110,10 +110,14 @@ public class ExamController {
     }
 
     @GetMapping("/result/{paperId}")
-    public String examResult(@PathVariable Long paperId, HttpSession session, Model model) {
+    public String examResult(@PathVariable Long paperId, HttpSession session, Model model, RedirectAttributes ra) {
         User user = (User) session.getAttribute("loginUser");
-        List<StudentAnswer> answers = examService.getStudentAnswers(user.getId(), paperId);
         Paper paper = paperService.findById(paperId);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/student/exam/list";
+        }
+        List<StudentAnswer> answers = examService.getStudentAnswers(user.getId(), paperId);
 
         int totalScore = 0;
         for (StudentAnswer sa : answers) {

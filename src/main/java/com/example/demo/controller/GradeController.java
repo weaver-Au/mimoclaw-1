@@ -75,10 +75,14 @@ public class GradeController {
     }
 
     @GetMapping("/teacher/grading/{paperId}")
-    public String teacherGradingDetail(@PathVariable Long paperId, Model model) {
+    public String teacherGradingDetail(@PathVariable Long paperId, Model model, RedirectAttributes ra) {
+        Paper paper = paperService.findById(paperId);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/teacher/grading";
+        }
         List<StudentAnswer> scores = gradeService.getScoresByPaper(paperId);
         Map<String, Object> stats = gradeService.getPaperStatistics(paperId);
-        Paper paper = paperService.findById(paperId);
 
         model.addAttribute("scores", scores);
         model.addAttribute("stats", stats);
@@ -87,9 +91,13 @@ public class GradeController {
     }
 
     @GetMapping("/teacher/grading/{paperId}/student/{studentId}")
-    public String teacherViewStudentPaper(@PathVariable Long paperId, @PathVariable Long studentId, Model model) {
-        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(studentId, paperId);
+    public String teacherViewStudentPaper(@PathVariable Long paperId, @PathVariable Long studentId, Model model, RedirectAttributes ra) {
         Paper paper = paperService.findById(paperId);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/teacher/grading";
+        }
+        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(studentId, paperId);
 
         int totalScore = 0;
         for (StudentAnswer sa : answers) {
@@ -105,9 +113,13 @@ public class GradeController {
 
     // ========== Manual Grading (for essay questions) ==========
     @GetMapping("/teacher/grading/{paperId}/student/{studentId}/grade")
-    public String manualGradeForm(@PathVariable Long paperId, @PathVariable Long studentId, Model model) {
-        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(studentId, paperId);
+    public String manualGradeForm(@PathVariable Long paperId, @PathVariable Long studentId, Model model, RedirectAttributes ra) {
         Paper paper = paperService.findById(paperId);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/teacher/grading";
+        }
+        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(studentId, paperId);
         model.addAttribute("answers", answers);
         model.addAttribute("paper", paper);
         model.addAttribute("studentId", studentId);

@@ -39,8 +39,13 @@ public class CourseController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("course", courseService.findById(id));
+    public String editForm(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        Course course = courseService.findById(id);
+        if (course == null) {
+            ra.addFlashAttribute("error", "课程不存在");
+            return "redirect:/admin/courses";
+        }
+        model.addAttribute("course", course);
         model.addAttribute("teachers", userService.findAllTeachers());
         return "admin/course-form";
     }
