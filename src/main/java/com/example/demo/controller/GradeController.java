@@ -40,10 +40,14 @@ public class GradeController {
     }
 
     @GetMapping("/student/grades/{paperId}")
-    public String studentGradeDetail(@PathVariable Long paperId, HttpSession session, Model model) {
+    public String studentGradeDetail(@PathVariable Long paperId, HttpSession session, Model model, RedirectAttributes ra) {
         User user = (User) session.getAttribute("loginUser");
-        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(user.getId(), paperId);
         Paper paper = paperService.findById(paperId);
+        if (paper == null) {
+            ra.addFlashAttribute("error", "试卷不存在");
+            return "redirect:/student/grades";
+        }
+        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(user.getId(), paperId);
 
         int totalScore = 0;
         for (StudentAnswer sa : answers) {
