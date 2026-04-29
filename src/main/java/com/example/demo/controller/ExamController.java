@@ -66,6 +66,10 @@ public class ExamController {
             return "redirect:/student/exam/list";
         }
 
+        if (paper.getPaperQuestions() == null || paper.getPaperQuestions().isEmpty()) {
+            ra.addFlashAttribute("error", "该试卷暂无题目");
+            return "redirect:/student/exam/list";
+        }
         model.addAttribute("paper", paper);
         return "student/exam-take";
     }

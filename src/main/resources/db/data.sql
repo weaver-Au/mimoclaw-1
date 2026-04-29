@@ -9,7 +9,7 @@ INSERT IGNORE INTO users(username, password, real_name, phone, class_name, role)
 -- Sample courses
 INSERT IGNORE INTO courses(id, name, teacher_id, description) VALUES(1, 'Java程序设计', 2, 'Java语言基础与面向对象编程');
 INSERT IGNORE INTO courses(id, name, teacher_id, description) VALUES(2, '数据结构与算法', 2, '常见数据结构和算法分析');
-INSERT IGNORE INTO courses(id, name, teacher_id, description) VALUES(3, '数据库原理', 3, '关系数据库设计与SQL');
+INSERT IGNORE INTO courses(id, name, teacher_id, description) VALUES(3, '数据库原理', 2, '关系数据库设计与SQL');
 
 -- Sample questions for Java course
 INSERT IGNORE INTO questions(id, course_id, type, content, options, answer, analysis, difficulty, creator_id) VALUES

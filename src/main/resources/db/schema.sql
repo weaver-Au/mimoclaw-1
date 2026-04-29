@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS student_answers (
   UNIQUE KEY uk_student_paper_question (student_id, paper_id, question_id)
 );
 
--- Insert default admin user
-INSERT IGNORE INTO users(username, password, real_name, role) VALUES('admin', 'admin123', '系统管理员', 'ADMIN');
-INSERT IGNORE INTO users(username, password, real_name, role) VALUES('teacher1', '123456', '张老师', 'TEACHER');
-INSERT IGNORE INTO users(username, password, real_name, class_name, role) VALUES('student1', '123456', '李同学', '计算机1班', 'STUDENT');
+-- Insert default admin user (with explicit IDs for FK consistency)
+INSERT IGNORE INTO users(id, username, password, real_name, role) VALUES(1, 'admin', 'admin123', '系统管理员', 'ADMIN');
+INSERT IGNORE INTO users(id, username, password, real_name, role) VALUES(2, 'teacher1', '123456', '张老师', 'TEACHER');
+INSERT IGNORE INTO users(id, username, password, real_name, class_name, role) VALUES(3, 'student1', '123456', '李同学', '计算机1班', 'STUDENT');

@@ -10,4 +10,6 @@ public interface GradeService {
     List<StudentAnswer> getStudentPapers(Long studentId);
     Map<String, Object> getPaperStatistics(Long paperId);
     List<StudentAnswer> getAllAnswersByPaper(Long paperId);
+    StudentAnswer findAnswerById(Long id);
+    void updateAnswerScore(Long id, Integer score, Boolean graded, Boolean isCorrect);
 }

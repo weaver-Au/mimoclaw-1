@@ -56,7 +56,7 @@ public class ExamServiceImpl implements ExamService {
                 int questionScore = (pq != null) ? pq.getScore() : 0;
 
                 if ("JUDGE".equals(question.getType()) || "SINGLE".equals(question.getType())) {
-                    if (question.getAnswer().equals(sa.getAnswer())) {
+                    if (question.getAnswer().equals(sa.getAnswer()) && sa.getAnswer() != null) {
                         sa.setIsCorrect(true);
                         sa.setScore(questionScore);
                     } else {

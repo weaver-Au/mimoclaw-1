@@ -32,7 +32,8 @@ public class AuthController {
 
         if ("phone".equals(loginType)) {
             // Phone login: verify code (hardcoded "123456" for demo)
-            if (phone == null || phone.isEmpty()) {
+            phone = phone != null ? phone.trim() : "";
+            if (phone.isEmpty()) {
                 ra.addFlashAttribute("error", "请输入手机号");
                 return "redirect:/login";
             }
@@ -51,7 +52,9 @@ public class AuthController {
             }
         } else {
             // Password login
-            if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
+            username = username != null ? username.trim() : "";
+            password = password != null ? password.trim() : "";
+            if (username.isEmpty() || password.isEmpty()) {
                 ra.addFlashAttribute("error", "请输入用户名和密码");
                 return "redirect:/login";
             }

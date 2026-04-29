@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-import com.example.demo.mapper.StudentAnswerMapper;
 
 @Controller
 public class GradeController {
@@ -30,8 +29,6 @@ public class GradeController {
     @Autowired
     private CourseService courseService;
 
-    @Autowired
-    private StudentAnswerMapper studentAnswerMapper;
 
     // ========== Student grade viewing ==========
     @GetMapping("/student/grades")
@@ -124,13 +121,7 @@ public class GradeController {
                             @RequestParam Integer[] scores,
                             RedirectAttributes ra) {
         for (int i = 0; i < answerIds.length; i++) {
-            StudentAnswer sa = studentAnswerMapper.findById(answerIds[i]);
-            if (sa != null) {
-                sa.setScore(scores[i]);
-                sa.setGraded(true);
-                sa.setIsCorrect(scores[i] > 0);
-                studentAnswerMapper.updateScore(sa);
-            }
+            gradeService.updateAnswerScore(answerIds[i], scores[i], true, scores[i] > 0);
         }
         ra.addFlashAttribute("success", "批改完成");
         return "redirect:/teacher/grading/" + paperId + "/student/" + studentId;

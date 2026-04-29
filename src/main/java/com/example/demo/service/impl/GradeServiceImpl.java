@@ -69,4 +69,20 @@ public class GradeServiceImpl implements GradeService {
     public List<StudentAnswer> getAllAnswersByPaper(Long paperId) {
         return studentAnswerMapper.findByPaperId(paperId);
     }
+
+    @Override
+    public StudentAnswer findAnswerById(Long id) {
+        return studentAnswerMapper.findById(id);
+    }
+
+    @Override
+    public void updateAnswerScore(Long id, Integer score, Boolean graded, Boolean isCorrect) {
+        StudentAnswer sa = studentAnswerMapper.findById(id);
+        if (sa != null) {
+            sa.setScore(score);
+            sa.setGraded(graded);
+            sa.setIsCorrect(isCorrect);
+            studentAnswerMapper.updateScore(sa);
+        }
+    }
 }
