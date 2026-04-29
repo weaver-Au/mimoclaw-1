@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('课程管理 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: admin-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">课程管理</h4>
+        <a th:href="@{/admin/courses/add}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>新增课程</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-1"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" th:action="@{/admin/courses}" method="get">
+                <div class="col-md-4">
+                    <input type="text" name="name" class="form-control" placeholder="课程名称" th:value="${name}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="teacherName" class="form-control" placeholder="教师姓名" th:value="${teacherName}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>搜索</button>
+                    <a th:href="@{/admin/courses}" class="btn btn-outline-secondary">重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr><th>ID</th><th>课程名称</th><th>授课教师</th><th>描述</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${courses}">
+                        <td th:text="${c.id}"></td>
+                        <td th:text="${c.name}"></td>
+                        <td th:text="${c.teacherName} ?: '未指定'"></td>
+                        <td th:text="${c.description} ?: '-'"></td>
+                        <td>
+                            <a th:href="@{/admin/courses/edit/{id}(id=${c.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a th:href="@{/admin/courses/delete/{id}(id=${c.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定删除？')"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(courses)}">
+                        <td colspan="5" class="text-center text-muted py-4">暂无数据</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('试卷管理 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">试卷管理</h4>
+        <a th:href="@{/teacher/papers/add}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>创建试卷</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-1"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" th:action="@{/teacher/papers}" method="get">
+                <div class="col-md-4">
+                    <input type="text" name="name" class="form-control" placeholder="试卷名称" th:value="${name}">
+                </div>
+                <div class="col-md-4">
+                    <select name="courseId" class="form-select">
+                        <option value="">全部课程</option>
+                        <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.name}" th:selected="${courseId != null && courseId == c.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>搜索</button>
+                    <a th:href="@{/teacher/papers}" class="btn btn-outline-secondary">重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr><th>ID</th><th>试卷名称</th><th>课程</th><th>总分</th><th>时长</th><th>状态</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${papers}">
+                        <td th:text="${p.id}"></td>
+                        <td th:text="${p.name}"></td>
+                        <td th:text="${p.courseName}"></td>
+                        <td th:text="${p.totalScore}"></td>
+                        <td th:text="${p.duration} + '分钟'"></td>
+                        <td>
+                            <span class="badge" th:classappend="${p.published ? 'bg-success' : 'bg-secondary'}" th:text="${p.published ? '已发布' : '未发布'}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/teacher/papers/selectQuestions/{id}(id=${p.id})}" class="btn btn-sm btn-outline-info" title="组卷"><i class="bi bi-list-check"></i></a>
+                            <a th:href="@{/teacher/papers/edit/{id}(id=${p.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a th:if="${!p.published}" th:href="@{/teacher/papers/publish/{id}(id=${p.id})}" class="btn btn-sm btn-outline-success" title="发布"><i class="bi bi-send"></i></a>
+                            <a th:if="${p.published}" th:href="@{/teacher/papers/unpublish/{id}(id=${p.id})}" class="btn btn-sm btn-outline-warning" title="取消发布"><i class="bi bi-x-circle"></i></a>
+                            <a th:href="@{/teacher/papers/delete/{id}(id=${p.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定删除？')"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(papers)}">
+                        <td colspan="7" class="text-center text-muted py-4">暂无试卷</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

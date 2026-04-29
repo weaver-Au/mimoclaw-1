@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('注册 - 在线考试系统')}"></head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus-fill text-success" style="font-size: 3rem;"></i>
+                        <h3 class="mt-2 fw-bold">学生注册</h3>
+                        <p class="text-muted">创建您的考试账号</p>
+                    </div>
+
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle me-1"></i><span th:text="${error}"></span>
+                    </div>
+
+                    <form th:action="@{/doRegister}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">用户名 <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control" placeholder="请输入用户名" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">密码 <span class="text-danger">*</span></label>
+                            <input type="password" name="password" class="form-control" placeholder="请输入密码" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">真实姓名 <span class="text-danger">*</span></label>
+                            <input type="text" name="realName" class="form-control" placeholder="请输入真实姓名" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">手机号</label>
+                            <input type="text" name="phone" class="form-control" placeholder="请输入手机号">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">班级</label>
+                            <input type="text" name="className" class="form-control" placeholder="请输入班级">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+                            <i class="bi bi-person-check me-1"></i>注册
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <span class="text-muted">已有账号？</span>
+                        <a th:href="@{/login}" class="text-decoration-none">返回登录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

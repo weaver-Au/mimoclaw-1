@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('教师工作台 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">教师工作台</h4>
+        <span class="text-muted">欢迎，<span th:text="${session.loginUser.realName}"></span></span>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center p-4">
+                    <div class="display-4 text-primary mb-2"><i class="bi bi-journal-text"></i></div>
+                    <h2 class="fw-bold" th:text="${questionCount}">0</h2>
+                    <p class="text-muted mb-0">我的试题</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center p-4">
+                    <div class="display-4 text-success mb-2"><i class="bi bi-file-earmark-text"></i></div>
+                    <h2 class="fw-bold" th:text="${paperCount}">0</h2>
+                    <p class="text-muted mb-0">我的试卷</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center p-4">
+                    <div class="display-4 text-warning mb-2"><i class="bi bi-book"></i></div>
+                    <h2 class="fw-bold" th:text="${courseCount}">0</h2>
+                    <p class="text-muted mb-0">我的课程</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-lightning me-2"></i>快捷操作</h5>
+            <div class="d-flex gap-3 mt-3">
+                <a th:href="@{/teacher/questions/add}" class="btn btn-outline-primary"><i class="bi bi-plus-circle me-1"></i>添加试题</a>
+                <a th:href="@{/teacher/papers/add}" class="btn btn-outline-success"><i class="bi bi-file-earmark-plus me-1"></i>创建试卷</a>
+                <a th:href="@{/teacher/grading}" class="btn btn-outline-warning"><i class="bi bi-check2-square me-1"></i>阅卷管理</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

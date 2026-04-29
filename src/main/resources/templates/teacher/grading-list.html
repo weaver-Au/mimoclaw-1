@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('阅卷管理 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4">阅卷管理</h4>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr><th>ID</th><th>试卷名称</th><th>课程</th><th>状态</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${papers}">
+                        <td th:text="${p.id}"></td>
+                        <td th:text="${p.name}"></td>
+                        <td th:text="${p.courseName}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${p.published ? 'bg-success' : 'bg-secondary'}" th:text="${p.published ? '已发布' : '未发布'}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/teacher/grading/{paperId}(paperId=${p.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye me-1"></i>查看成绩</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(papers)}">
+                        <td colspan="5" class="text-center text-muted py-4">暂无试卷</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

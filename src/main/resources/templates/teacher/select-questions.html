@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('组卷 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-2">组卷：<span th:text="${paper.name}"></span></h4>
+    <p class="text-muted mb-4">课程：<span th:text="${paper.courseName}"></span> | 总分：<span th:text="${paper.totalScore}"></span></p>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-1"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="@{/teacher/papers/save}" method="post" id="paperForm">
+        <input type="hidden" name="id" th:value="${paper.id}">
+        <input type="hidden" name="name" th:value="${paper.name}">
+        <input type="hidden" name="courseId" th:value="${paper.courseId}">
+        <input type="hidden" name="totalScore" th:value="${paper.totalScore}">
+        <input type="hidden" name="duration" th:value="${paper.duration}">
+        <input type="hidden" name="published" th:value="${paper.published}">
+
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-list-check me-1"></i>选择试题</span>
+                <span class="badge bg-primary" id="selectedCount">已选 0 题</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr><th width="50">选择</th><th>课程</th><th>题型</th><th>题目内容</th><th>难度</th><th width="100">分值</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="q, iter : ${allQuestions}">
+                            <td>
+                                <input type="checkbox" name="questionIds" th:value="${q.id}" class="form-check-input question-check"
+                                       th:checked="${paper.paperQuestions != null and paper.paperQuestions.?[questionId == ${q.id}].size() > 0}">
+                            </td>
+                            <td th:text="${q.courseName}"></td>
+                            <td>
+                                <span class="badge" th:classappend="${q.type == 'SINGLE' ? 'bg-primary' : (q.type == 'MULTI' ? 'bg-info' : 'bg-warning text-dark')}"
+                                      th:text="${q.type == 'SINGLE' ? '单选' : (q.type == 'MULTI' ? '多选' : '判断')}"></span>
+                            </td>
+                            <td th:text="${#strings.length(q.content) > 60} ? ${#strings.substring(q.content, 0, 60)} + '...' : ${q.content}"></td>
+                            <td>
+                                <span class="badge" th:classappend="${q.difficulty == 1 ? 'bg-success' : (q.difficulty == 2 ? 'bg-warning text-dark' : 'bg-danger')}"
+                                      th:text="${q.difficulty == 1 ? '简单' : (q.difficulty == 2 ? '中等' : '困难')}"></span>
+                            </td>
+                            <td><input type="number" name="questionScores" class="form-control form-control-sm" value="1" min="1" style="width:70px;"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(allQuestions)}">
+                            <td colspan="6" class="text-center text-muted py-4">该课程暂无试题，请先添加试题</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>保存组卷</button>
+            <a th:href="@{/teacher/papers}" class="btn btn-outline-secondary">返回列表</a>
+        </div>
+    </form>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+document.querySelectorAll('.question-check').forEach(function(cb) {
+    cb.addEventListener('change', updateCount);
+});
+function updateCount() {
+    var count = document.querySelectorAll('.question-check:checked').length;
+    document.getElementById('selectedCount').textContent = '已选 ' + count + ' 题';
+}
+updateCount();
+</script>
+</body>
+</html>

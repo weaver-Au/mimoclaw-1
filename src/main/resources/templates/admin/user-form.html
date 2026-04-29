@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header((${user.id} != null ? '编辑用户' : '新增用户') + ' - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: admin-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4" th:text="${user.id} != null ? '编辑用户' : '新增用户'">用户表单</h4>
+
+    <div class="card">
+        <div class="card-body p-4">
+            <form th:action="@{/admin/users/save}" method="post">
+                <input type="hidden" name="id" th:value="${user.id}">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">用户名 <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control" th:value="${user.username}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">密码 <span th:if="${user.id == null}" class="text-danger">*</span><span th:if="${user.id != null}" class="text-muted">(留空不修改)</span></label>
+                        <input type="password" name="password" class="form-control" th:value="${user.password}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">真实姓名 <span class="text-danger">*</span></label>
+                        <input type="text" name="realName" class="form-control" th:value="${user.realName}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">手机号</label>
+                        <input type="text" name="phone" class="form-control" th:value="${user.phone}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">班级</label>
+                        <input type="text" name="className" class="form-control" th:value="${user.className}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">角色 <span class="text-danger">*</span></label>
+                        <select name="role" class="form-select" required>
+                            <option value="STUDENT" th:selected="${user.role == 'STUDENT'}">学生</option>
+                            <option value="TEACHER" th:selected="${user.role == 'TEACHER'}">教师</option>
+                            <option value="ADMIN" th:selected="${user.role == 'ADMIN'}">管理员</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>保存</button>
+                    <a th:href="@{/admin/users}" class="btn btn-outline-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

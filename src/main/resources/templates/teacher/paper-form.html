@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header((${paper.id} != null ? '编辑试卷' : '创建试卷') + ' - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4" th:text="${paper.id} != null ? '编辑试卷' : '创建试卷'">试卷表单</h4>
+
+    <div class="card">
+        <div class="card-body p-4">
+            <form th:action="@{/teacher/papers/save}" method="post">
+                <input type="hidden" name="id" th:value="${paper.id}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">试卷名称 <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" th:value="${paper.name}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">所属课程 <span class="text-danger">*</span></label>
+                        <select name="courseId" class="form-select" required>
+                            <option value="">请选择课程</option>
+                            <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.name}" th:selected="${paper.courseId != null && paper.courseId == c.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">总分</label>
+                        <input type="number" name="totalScore" class="form-control" th:value="${paper.totalScore != null ? paper.totalScore : 100}" min="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">考试时长（分钟）</label>
+                        <input type="number" name="duration" class="form-control" th:value="${paper.duration != null ? paper.duration : 120}" min="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">发布状态</label>
+                        <select name="published" class="form-select">
+                            <option value="false" th:selected="${paper.published == null || !paper.published}">未发布</option>
+                            <option value="true" th:selected="${paper.published != null && paper.published}">已发布</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">开始时间</label>
+                        <input type="datetime-local" name="startTime" class="form-control" th:value="${paper.startTime}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">结束时间</label>
+                        <input type="datetime-local" name="endTime" class="form-control" th:value="${paper.endTime}">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>保存</button>
+                    <a th:href="@{/teacher/papers}" class="btn btn-outline-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

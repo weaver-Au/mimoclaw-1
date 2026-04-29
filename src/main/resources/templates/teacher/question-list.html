@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('题库管理 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">题库管理</h4>
+        <a th:href="@{/teacher/questions/add}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>新增试题</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-1"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" th:action="@{/teacher/questions}" method="get">
+                <div class="col-md-2">
+                    <select name="courseId" class="form-select">
+                        <option value="">全部课程</option>
+                        <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.name}" th:selected="${courseId != null && courseId == c.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="type" class="form-select">
+                        <option value="">全部题型</option>
+                        <option value="SINGLE" th:selected="${type == 'SINGLE'}">单选题</option>
+                        <option value="MULTI" th:selected="${type == 'MULTI'}">多选题</option>
+                        <option value="JUDGE" th:selected="${type == 'JUDGE'}">判断题</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="difficulty" class="form-select">
+                        <option value="">全部难度</option>
+                        <option value="1" th:selected="${difficulty != null && difficulty == 1}">简单</option>
+                        <option value="2" th:selected="${difficulty != null && difficulty == 2}">中等</option>
+                        <option value="3" th:selected="${difficulty != null && difficulty == 3}">困难</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="keyword" class="form-control" placeholder="关键字搜索" th:value="${keyword}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>搜索</button>
+                    <a th:href="@{/teacher/questions}" class="btn btn-outline-secondary">重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr><th>ID</th><th>课程</th><th>题型</th><th>题目内容</th><th>难度</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="q : ${questions}">
+                        <td th:text="${q.id}"></td>
+                        <td th:text="${q.courseName}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${q.type == 'SINGLE' ? 'bg-primary' : (q.type == 'MULTI' ? 'bg-info' : 'bg-warning text-dark')}"
+                                  th:text="${q.type == 'SINGLE' ? '单选' : (q.type == 'MULTI' ? '多选' : '判断')}"></span>
+                        </td>
+                        <td th:text="${#strings.length(q.content) > 50} ? ${#strings.substring(q.content, 0, 50)} + '...' : ${q.content}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${q.difficulty == 1 ? 'bg-success' : (q.difficulty == 2 ? 'bg-warning text-dark' : 'bg-danger')}"
+                                  th:text="${q.difficulty == 1 ? '简单' : (q.difficulty == 2 ? '中等' : '困难')}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/teacher/questions/edit/{id}(id=${q.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a th:href="@{/teacher/questions/delete/{id}(id=${q.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定删除？')"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(questions)}">
+                        <td colspan="6" class="text-center text-muted py-4">暂无试题</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

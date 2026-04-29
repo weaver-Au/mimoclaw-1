@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('我的成绩 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: student-navbar}"></nav>
+
+<div class="container" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4">我的成绩</h4>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr><th>试卷ID</th><th>试卷名称</th><th>得分</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${papers}">
+                        <td th:text="${p.paperId}"></td>
+                        <td th:text="${p.paperName ?: '试卷'}"></td>
+                        <td><span class="badge bg-primary fs-6" th:text="${p.score}"></span></td>
+                        <td>
+                            <a th:href="@{/student/grades/{paperId}(paperId=${p.paperId})}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye me-1"></i>查看详情</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(papers)}">
+                        <td colspan="4" class="text-center text-muted py-4">暂无考试记录</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('成绩查看 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: admin-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4">成绩查看</h4>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" th:action="@{/admin/grades}" method="get">
+                <div class="col-md-6">
+                    <select name="paperId" class="form-select">
+                        <option value="">选择试卷</option>
+                        <option th:each="p : ${papers}" th:value="${p.id}" th:text="${p.name}" th:selected="${selectedPaperId != null && selectedPaperId == p.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>查询</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${stats}" class="row g-4 mb-4">
+        <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-primary" th:text="${stats.count}">0</h5><small class="text-muted">参考人数</small></div></div></div>
+        <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-success" th:text="${stats.avgScore}">0</h5><small class="text-muted">平均分</small></div></div></div>
+        <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-warning" th:text="${stats.maxScore}">0</h5><small class="text-muted">最高分</small></div></div></div>
+        <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-danger" th:text="${stats.minScore}">0</h5><small class="text-muted">最低分</small></div></div></div>
+    </div>
+
+    <div th:if="${scores}" class="card">
+        <div class="card-header"><i class="bi bi-table me-1"></i>成绩单</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead><tr><th>学生ID</th><th>学生姓名</th><th>总分</th></tr></thead>
+                    <tbody>
+                    <tr th:each="s : ${scores}">
+                        <td th:text="${s.studentId}"></td>
+                        <td th:text="${s.studentName}"></td>
+                        <td><span class="badge bg-primary" th:text="${s.score}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div th:if="${scores == null}" class="text-center text-muted py-5">
+        <i class="bi bi-bar-chart display-4"></i>
+        <p class="mt-2">请选择试卷查看成绩</p>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

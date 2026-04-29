@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header((${question.id} != null ? '编辑试题' : '新增试题') + ' - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4" th:text="${question.id} != null ? '编辑试题' : '新增试题'">试题表单</h4>
+
+    <div class="card">
+        <div class="card-body p-4">
+            <form th:action="@{/teacher/questions/save}" method="post" id="questionForm">
+                <input type="hidden" name="id" th:value="${question.id}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">所属课程 <span class="text-danger">*</span></label>
+                        <select name="courseId" class="form-select" required>
+                            <option value="">请选择课程</option>
+                            <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.name}" th:selected="${question.courseId != null && question.courseId == c.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">题型 <span class="text-danger">*</span></label>
+                        <select name="type" class="form-select" id="questionType" required onchange="onTypeChange()">
+                            <option value="SINGLE" th:selected="${question.type == 'SINGLE'}">单选题</option>
+                            <option value="MULTI" th:selected="${question.type == 'MULTI'}">多选题</option>
+                            <option value="JUDGE" th:selected="${question.type == 'JUDGE'}">判断题</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">难度 <span class="text-danger">*</span></label>
+                        <select name="difficulty" class="form-select" required>
+                            <option value="1" th:selected="${question.difficulty != null && question.difficulty == 1}">简单</option>
+                            <option value="2" th:selected="${question.difficulty != null && question.difficulty == 2}">中等</option>
+                            <option value="3" th:selected="${question.difficulty != null && question.difficulty == 3}">困难</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">题目内容 <span class="text-danger">*</span></label>
+                        <textarea name="content" class="form-control" rows="3" required th:text="${question.content}"></textarea>
+                    </div>
+
+                    <div class="col-12" id="optionsSection">
+                        <label class="form-label fw-semibold">选项</label>
+                        <div id="optionsContainer">
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">A</span>
+                                <input type="text" class="form-control option-input" placeholder="选项A">
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">B</span>
+                                <input type="text" class="form-control option-input" placeholder="选项B">
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">C</span>
+                                <input type="text" class="form-control option-input" placeholder="选项C">
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">D</span>
+                                <input type="text" class="form-control option-input" placeholder="选项D">
+                            </div>
+                        </div>
+                        <input type="hidden" name="options" id="optionsJson" th:value="${question.options}">
+                    </div>
+
+                    <div class="col-md-6" id="answerSection">
+                        <label class="form-label fw-semibold">正确答案 <span class="text-danger">*</span></label>
+                        <div id="singleAnswer">
+                            <select name="answer" class="form-select" id="singleSelect">
+                                <option value="A" th:selected="${question.answer == 'A'}">A</option>
+                                <option value="B" th:selected="${question.answer == 'B'}">B</option>
+                                <option value="C" th:selected="${question.answer == 'C'}">C</option>
+                                <option value="D" th:selected="${question.answer == 'D'}">D</option>
+                            </select>
+                        </div>
+                        <div id="multiAnswer" style="display:none;">
+                            <input type="text" name="multiAnswer" class="form-control" placeholder="如: A,B,C" id="multiInput" th:value="${question.answer}">
+                        </div>
+                        <div id="judgeAnswer" style="display:none;">
+                            <select name="judgeAnswer" class="form-select" id="judgeSelect">
+                                <option value="正确" th:selected="${question.answer == '正确'}">正确</option>
+                                <option value="错误" th:selected="${question.answer == '错误'}">错误</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">答案解析</label>
+                        <textarea name="analysis" class="form-control" rows="2" th:text="${question.analysis}"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary" onclick="prepareSubmit()"><i class="bi bi-check-circle me-1"></i>保存</button>
+                    <a th:href="@{/teacher/questions}" class="btn btn-outline-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+<script>
+function onTypeChange() {
+    var type = document.getElementById('questionType').value;
+    document.getElementById('singleAnswer').style.display = type === 'SINGLE' ? 'block' : 'none';
+    document.getElementById('multiAnswer').style.display = type === 'MULTI' ? 'block' : 'none';
+    document.getElementById('judgeAnswer').style.display = type === 'JUDGE' ? 'block' : 'none';
+    document.getElementById('optionsSection').style.display = type === 'JUDGE' ? 'none' : 'block';
+}
+
+function prepareSubmit() {
+    var type = document.getElementById('questionType').value;
+    if (type !== 'JUDGE') {
+        var options = [];
+        document.querySelectorAll('.option-input').forEach(function(input) {
+            if (input.value.trim()) options.push(input.value.trim());
+        });
+        document.getElementById('optionsJson').value = JSON.stringify(options);
+    } else {
+        document.getElementById('optionsJson').value = '["正确","错误"]';
+    }
+
+    var form = document.getElementById('questionForm');
+    var answerInput = form.querySelector('input[name="answer"]');
+    if (!answerInput) {
+        answerInput = document.createElement('input');
+        answerInput.type = 'hidden';
+        answerInput.name = 'answer';
+        form.appendChild(answerInput);
+    }
+    if (type === 'SINGLE') answerInput.value = document.getElementById('singleSelect').value;
+    else if (type === 'MULTI') answerInput.value = document.getElementById('multiInput').value;
+    else if (type === 'JUDGE') answerInput.value = document.getElementById('judgeSelect').value;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    onTypeChange();
+    // Populate existing options
+    var optionsJson = document.getElementById('optionsJson').value;
+    if (optionsJson && optionsJson !== 'null') {
+        try {
+            var opts = JSON.parse(optionsJson);
+            var inputs = document.querySelectorAll('.option-input');
+            opts.forEach(function(opt, i) {
+                if (inputs[i]) inputs[i].value = opt;
+            });
+        } catch(e) {}
+    }
+});
+</script>
+</body>
+</html>

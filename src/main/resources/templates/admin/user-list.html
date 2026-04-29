@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('用户管理 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: admin-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">用户管理</h4>
+        <a th:href="@{/admin/users/add}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>新增用户</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-1"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-circle me-1"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" th:action="@{/admin/users}" method="get">
+                <div class="col-md-3">
+                    <input type="text" name="username" class="form-control" placeholder="用户名" th:value="${username}">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="realName" class="form-control" placeholder="真实姓名" th:value="${realName}">
+                </div>
+                <div class="col-md-3">
+                    <select name="role" class="form-select">
+                        <option value="">全部角色</option>
+                        <option value="STUDENT" th:selected="${role == 'STUDENT'}">学生</option>
+                        <option value="TEACHER" th:selected="${role == 'TEACHER'}">教师</option>
+                        <option value="ADMIN" th:selected="${role == 'ADMIN'}">管理员</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>搜索</button>
+                    <a th:href="@{/admin/users}" class="btn btn-outline-secondary">重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>ID</th><th>用户名</th><th>真实姓名</th><th>手机号</th><th>班级</th><th>角色</th><th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.id}"></td>
+                        <td th:text="${u.username}"></td>
+                        <td th:text="${u.realName}"></td>
+                        <td th:text="${u.phone}">-</td>
+                        <td th:text="${u.className}">-</td>
+                        <td>
+                            <span class="badge" th:classappend="${u.role == 'ADMIN' ? 'bg-danger' : (u.role == 'TEACHER' ? 'bg-info' : 'bg-success')}" th:text="${u.role}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/users/edit/{id}(id=${u.id})}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a th:href="@{/admin/users/delete/{id}(id=${u.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定删除该用户？')"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="7" class="text-center text-muted py-4">暂无数据</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

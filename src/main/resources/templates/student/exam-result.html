@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('考试结果 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: student-navbar}"></nav>
+
+<div class="container" style="padding-top: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card text-center mb-4">
+                <div class="card-body p-5">
+                    <i class="bi bi-check-circle text-success display-1"></i>
+                    <h3 class="fw-bold mt-3">试卷提交成功！</h3>
+                    <p class="text-muted" th:text="'试卷：' + ${paper.name}"></p>
+                    <div class="display-3 fw-bold text-primary my-3" th:text="${totalScore} + '分'">0分</div>
+                    <p class="text-muted">客观题已自动评分</p>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-3">答题详情</h5>
+            <div class="card mb-3" th:each="a, iter : ${answers}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold">
+                            第 <span th:text="${iter.index + 1}"></span> 题
+                            <span class="badge ms-2" th:classappend="${a.isCorrect ? 'bg-success' : 'bg-danger'}" th:text="${a.isCorrect ? '✓ 正确' : '✗ 错误'}"></span>
+                        </h6>
+                        <span class="fw-bold" th:text="${a.score} + '分'"></span>
+                    </div>
+                    <p th:text="${a.questionContent}"></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">你的答案：</small>
+                            <span th:class="${a.isCorrect ? 'text-success' : 'text-danger'}" th:text="${a.answer ?: '未作答'}" class="fw-semibold"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">正确答案：</small>
+                            <span class="text-success fw-semibold" th:text="${a.correctAnswer}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a th:href="@{/student/exam/list}" class="btn btn-primary"><i class="bi bi-arrow-left me-1"></i>返回考试列表</a>
+                <a th:href="@{/student/grades}" class="btn btn-outline-success"><i class="bi bi-bar-chart me-1"></i>查看成绩</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header((${course.id} != null ? '编辑课程' : '新增课程') + ' - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: admin-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-4" th:text="${course.id} != null ? '编辑课程' : '新增课程'">课程表单</h4>
+
+    <div class="card">
+        <div class="card-body p-4">
+            <form th:action="@{/admin/courses/save}" method="post">
+                <input type="hidden" name="id" th:value="${course.id}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">课程名称 <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" th:value="${course.name}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">授课教师</label>
+                        <select name="teacherId" class="form-select">
+                            <option value="">请选择教师</option>
+                            <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.realName}" th:selected="${course.teacherId == t.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">课程描述</label>
+                        <textarea name="description" class="form-control" rows="3" th:text="${course.description}"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>保存</button>
+                    <a th:href="@{/admin/courses}" class="btn btn-outline-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
