@@ -16,6 +16,21 @@
         <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-danger" th:text="${stats.minScore}">0</h5><small class="text-muted">最低分</small></div></div></div>
     </div>
 
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header fw-bold"><i class="bi bi-bar-chart me-1"></i>成绩分布</div>
+                <div class="card-body"><canvas id="scoreChart"></canvas></div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header fw-bold"><i class="bi bi-pie-chart me-1"></i>及格率</div>
+                <div class="card-body"><canvas id="passChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
     <div class="card mb-3">
         <div class="card-body text-center">
             <span class="fw-semibold">及格率：</span>

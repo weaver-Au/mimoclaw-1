@@ -79,6 +79,19 @@ function updateCount() {
     document.getElementById('selectedCount').textContent = '已选 ' + count + ' 题';
 }
 updateCount();
+
+// Only submit checked questions' data
+document.getElementById('paperForm').addEventListener('submit', function(e) {
+    document.querySelectorAll('.question-check').forEach(function(cb) {
+        if (!cb.checked) {
+            cb.disabled = true;
+            // Also disable the corresponding score input
+            var row = cb.closest('tr');
+            var scoreInput = row.querySelector('input[name="questionScores"]');
+            if (scoreInput) scoreInput.disabled = true;
+        }
+    });
+});
 </script>
 </body>
 </html>
