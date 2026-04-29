@@ -25,7 +25,8 @@ public interface PaperMapper {
 
     @Select("SELECT p.*, c.name as course_name, u.real_name as creator_name FROM papers p " +
             "LEFT JOIN courses c ON p.course_id = c.id LEFT JOIN users u ON p.creator_id = u.id " +
-            "WHERE p.published = 1 ORDER BY p.id DESC")
+            "WHERE p.published = 1 AND (p.start_time IS NULL OR p.start_time <= NOW()) " +
+            "AND (p.end_time IS NULL OR p.end_time >= NOW()) ORDER BY p.id DESC")
     List<Paper> findPublished();
 
     @Select("SELECT p.*, c.name as course_name, u.real_name as creator_name FROM papers p " +

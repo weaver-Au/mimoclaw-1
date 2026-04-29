@@ -8,6 +8,23 @@
 <div class="main-content" style="padding-top: 80px;">
     <h4 class="fw-bold mb-4">阅卷管理</h4>
 
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" th:action="@{/teacher/grading}" method="get">
+                <div class="col-md-4">
+                    <select name="courseId" class="form-select">
+                        <option value="">全部课程</option>
+                        <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.name}" th:selected="${selectedCourseId != null && selectedCourseId == c.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>筛选</button>
+                    <a th:href="@{/teacher/grading}" class="btn btn-outline-secondary">重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">

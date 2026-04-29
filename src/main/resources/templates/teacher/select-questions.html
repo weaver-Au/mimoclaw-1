@@ -37,7 +37,7 @@
                         <tr th:each="q, iter : ${allQuestions}">
                             <td>
                                 <input type="checkbox" name="questionIds" th:value="${q.id}" class="form-check-input question-check"
-                                       th:checked="${paper.paperQuestions != null and paper.paperQuestions.?[questionId == ${q.id}].size() > 0}">
+                                       th:checked="${selectedScores.containsKey(q.id)}">
                             </td>
                             <td th:text="${q.courseName}"></td>
                             <td>
@@ -49,7 +49,7 @@
                                 <span class="badge" th:classappend="${q.difficulty == 1 ? 'bg-success' : (q.difficulty == 2 ? 'bg-warning text-dark' : 'bg-danger')}"
                                       th:text="${q.difficulty == 1 ? '简单' : (q.difficulty == 2 ? '中等' : '困难')}"></span>
                             </td>
-                            <td><input type="number" name="questionScores" class="form-control form-control-sm" value="1" min="1" style="width:70px;"></td>
+                            <td><input type="number" name="questionScores" class="form-control form-control-sm" th:value="${selectedScores.containsKey(q.id) ? selectedScores.get(q.id) : 1}" min="1" style="width:70px;"></td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(allQuestions)}">
                             <td colspan="6" class="text-center text-muted py-4">该课程暂无试题，请先添加试题</td>

@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,10 +40,29 @@ public class ExamController {
             ra.addFlashAttribute("error", "您已提交过该试卷");
             return "redirect:/student/exam/list";
         }
+        Paper paper = paperService.findById(paperId);
+        if (paper == null || !paper.getPublished()) {
+            ra.addFlashAttribute("error", "试卷不存在或未发布");
+            return "redirect:/student/exam/list";
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (paper.getEndTime() != null && now.isAfter(paper.getEndTime())) {
+            ra.addFlashAttribute("error", "考试已结束，无法提交");
+            return "redirect:/student/exam/list";
+        }
 
         Paper paper = paperService.findByIdWithQuestions(paperId);
         if (paper == null || !paper.getPublished()) {
             ra.addFlashAttribute("error", "试卷不存在或未发布");
+            return "redirect:/student/exam/list";
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (paper.getStartTime() != null && now.isBefore(paper.getStartTime())) {
+            ra.addFlashAttribute("error", "考试尚未开始");
+            return "redirect:/student/exam/list";
+        }
+        if (paper.getEndTime() != null && now.isAfter(paper.getEndTime())) {
+            ra.addFlashAttribute("error", "考试已结束");
             return "redirect:/student/exam/list";
         }
 
@@ -59,6 +79,16 @@ public class ExamController {
 
         if (examService.hasSubmitted(user.getId(), paperId)) {
             ra.addFlashAttribute("error", "您已提交过该试卷");
+            return "redirect:/student/exam/list";
+        }
+        Paper paper = paperService.findById(paperId);
+        if (paper == null || !paper.getPublished()) {
+            ra.addFlashAttribute("error", "试卷不存在或未发布");
+            return "redirect:/student/exam/list";
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (paper.getEndTime() != null && now.isAfter(paper.getEndTime())) {
+            ra.addFlashAttribute("error", "考试已结束，无法提交");
             return "redirect:/student/exam/list";
         }
 

@@ -11,14 +11,26 @@
     <div class="card mb-4">
         <div class="card-body">
             <form class="row g-3" th:action="@{/admin/grades}" method="get">
-                <div class="col-md-6">
+                <div class="col-md-3">
+                    <select name="courseId" class="form-select" onchange="this.form.submit()">
+                        <option value="">全部课程</option>
+                        <option th:each="c : ${courses}" th:value="${c.id}" th:text="${c.name}" th:selected="${selectedCourseId != null && selectedCourseId == c.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
                     <select name="paperId" class="form-select">
                         <option value="">选择试卷</option>
                         <option th:each="p : ${papers}" th:value="${p.id}" th:text="${p.name}" th:selected="${selectedPaperId != null && selectedPaperId == p.id}"></option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <input type="text" name="className" class="form-control" placeholder="按班级筛选" th:value="${className}">
+                </div>
+                <div class="col-md-2">
                     <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>查询</button>
+                </div>
+                <div class="col-md-2">
+                    <a th:href="@{/admin/grades}" class="btn btn-outline-secondary">重置</a>
                 </div>
             </form>
         </div>
@@ -29,6 +41,13 @@
         <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-success" th:text="${stats.avgScore}">0</h5><small class="text-muted">平均分</small></div></div></div>
         <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-warning" th:text="${stats.maxScore}">0</h5><small class="text-muted">最高分</small></div></div></div>
         <div class="col-md-3"><div class="card stat-card"><div class="card-body text-center"><h5 class="text-danger" th:text="${stats.minScore}">0</h5><small class="text-muted">最低分</small></div></div></div>
+    </div>
+
+    <div th:if="${stats}" class="card mb-3">
+        <div class="card-body text-center">
+            <span class="fw-semibold">及格率：</span>
+            <span class="display-6 fw-bold text-success" th:text="${stats.passRate} + '%'">0%</span>
+        </div>
     </div>
 
     <div th:if="${scores}" class="card">

@@ -38,7 +38,7 @@ public class PaperServiceImpl implements PaperService {
             List<PaperQuestion> pqs = paperQuestionMapper.findByPaperId(id);
             List<Question> questions = new ArrayList<>();
             for (PaperQuestion pq : pqs) {
-                if (pq.getQuestion() != null) {
+                if (pq.getQuestion() != null && pq.getQuestion().getId() != null) {
                     questions.add(pq.getQuestion());
                 }
             }

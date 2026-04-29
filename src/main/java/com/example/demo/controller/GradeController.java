@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Course;
 import com.example.demo.entity.Paper;
 import com.example.demo.entity.StudentAnswer;
 import com.example.demo.entity.User;
+import com.example.demo.service.CourseService;
 import com.example.demo.service.GradeService;
 import com.example.demo.service.PaperService;
 import jakarta.servlet.http.HttpSession;
@@ -23,7 +25,10 @@ public class GradeController {
     @Autowired
     private PaperService paperService;
 
-    // Student grade viewing
+    @Autowired
+    private CourseService courseService;
+
+    // ========== Student grade viewing ==========
     @GetMapping("/student/grades")
     public String studentGrades(HttpSession session, Model model) {
         User user = (User) session.getAttribute("loginUser");
@@ -49,12 +54,21 @@ public class GradeController {
         return "student/grade-detail";
     }
 
-    // Teacher grading
+    // ========== Teacher grading ==========
     @GetMapping("/teacher/grading")
-    public String teacherGradingList(HttpSession session, Model model) {
+    public String teacherGradingList(@RequestParam(required = false) Long courseId,
+                                     HttpSession session, Model model) {
         User user = (User) session.getAttribute("loginUser");
-        List<Paper> papers = paperService.findByCreatorId(user.getId());
+        List<Course> courses = courseService.findByTeacherId(user.getId());
+        List<Paper> papers;
+        if (courseId != null) {
+            papers = paperService.search(null, courseId, user.getId(), null);
+        } else {
+            papers = paperService.findByCreatorId(user.getId());
+        }
         model.addAttribute("papers", papers);
+        model.addAttribute("courses", courses);
+        model.addAttribute("selectedCourseId", courseId);
         return "teacher/grading-list";
     }
 
@@ -86,18 +100,36 @@ public class GradeController {
         return "teacher/student-paper";
     }
 
-    // Admin grade viewing
+    // ========== Admin grade viewing ==========
     @GetMapping("/admin/grades")
-    public String adminGrades(@RequestParam(required = false) Long paperId, Model model) {
+    public String adminGrades(@RequestParam(required = false) Long paperId,
+                              @RequestParam(required = false) Long courseId,
+                              @RequestParam(required = false) String className,
+                              Model model) {
+        List<Paper> papers;
+        if (courseId != null) {
+            papers = paperService.search(null, courseId, null, null);
+        } else {
+            papers = paperService.search(null, null, null, null);
+        }
+        List<Course> courses = courseService.findAll();
+
         if (paperId != null) {
             List<StudentAnswer> scores = gradeService.getScoresByPaper(paperId);
+            // Filter by className if specified
+            if (className != null && !className.isEmpty()) {
+                scores.removeIf(s -> s.getStudentName() == null || !s.getStudentName().contains(className));
+            }
             Map<String, Object> stats = gradeService.getPaperStatistics(paperId);
             model.addAttribute("scores", scores);
             model.addAttribute("stats", stats);
             model.addAttribute("selectedPaperId", paperId);
         }
-        List<Paper> papers = paperService.search(null, null, null, null);
+
         model.addAttribute("papers", papers);
+        model.addAttribute("courses", courses);
+        model.addAttribute("selectedCourseId", courseId);
+        model.addAttribute("className", className);
         return "admin/grade-list";
     }
 }

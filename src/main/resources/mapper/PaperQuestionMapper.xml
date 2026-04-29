@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.PaperQuestionMapper">
+
+    <resultMap id="paperQuestionWithQuestion" type="com.example.demo.entity.PaperQuestion">
+        <id property="id" column="pq_id"/>
+        <result property="paperId" column="paper_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="score" column="pq_score"/>
+        <association property="question" javaType="com.example.demo.entity.Question">
+            <id property="id" column="question_id"/>
+            <result property="content" column="question_content"/>
+            <result property="type" column="question_type"/>
+            <result property="options" column="question_options"/>
+            <result property="answer" column="question_answer"/>
+            <result property="analysis" column="question_analysis"/>
+            <result property="difficulty" column="question_difficulty"/>
+        </association>
+    </resultMap>
+
+    <select id="findByPaperId" resultMap="paperQuestionWithQuestion">
+        SELECT pq.id as pq_id, pq.paper_id, pq.question_id, pq.sort_order, pq.score as pq_score,
+               q.content as question_content, q.type as question_type, q.options as question_options,
+               q.answer as question_answer, q.analysis as question_analysis, q.difficulty as question_difficulty
+        FROM paper_questions pq
+        LEFT JOIN questions q ON pq.question_id = q.id
+        WHERE pq.paper_id = #{paperId}
+        ORDER BY pq.sort_order
+    </select>
+
+</mapper>

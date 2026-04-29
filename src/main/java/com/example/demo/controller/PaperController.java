@@ -63,6 +63,14 @@ public class PaperController {
         Paper paper = paperService.findByIdWithQuestions(id);
         model.addAttribute("paper", paper);
         model.addAttribute("allQuestions", questionService.findByCourseId(paper.getCourseId()));
+        // Build a map of questionId -> score for existing paper questions
+        java.util.Map<Long, Integer> selectedScores = new java.util.HashMap<>();
+        if (paper.getPaperQuestions() != null) {
+            for (com.example.demo.entity.PaperQuestion pq : paper.getPaperQuestions()) {
+                selectedScores.put(pq.getQuestionId(), pq.getScore());
+            }
+        }
+        model.addAttribute("selectedScores", selectedScores);
         return "teacher/select-questions";
     }
 
