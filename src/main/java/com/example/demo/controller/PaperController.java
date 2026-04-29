@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Paper;
-import com.example.demo.entity.PaperQuestion;
+import PaperQuestion;
+import Question;
 import com.example.demo.entity.User;
 import com.example.demo.service.CourseService;
 import com.example.demo.service.PaperService;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/teacher/papers")
@@ -61,12 +63,13 @@ public class PaperController {
     @GetMapping("/selectQuestions/{id}")
     public String selectQuestions(@PathVariable Long id, Model model) {
         Paper paper = paperService.findByIdWithQuestions(id);
+        if (paper == null) return "redirect:/teacher/papers";
         model.addAttribute("paper", paper);
         model.addAttribute("allQuestions", questionService.findByCourseId(paper.getCourseId()));
         // Build a map of questionId -> score for existing paper questions
-        java.util.Map<Long, Integer> selectedScores = new java.util.HashMap<>();
+        java.util.Map<Long, Integer> selectedScores = new HashMap<>()();
         if (paper.getPaperQuestions() != null) {
-            for (com.example.demo.entity.PaperQuestion pq : paper.getPaperQuestions()) {
+            for (PaperQuestion pq : paper.getPaperQuestions()) {
                 selectedScores.put(pq.getQuestionId(), pq.getScore());
             }
         }
@@ -77,6 +80,7 @@ public class PaperController {
     @GetMapping("/autoGenerate/{id}")
     public String autoGenerateForm(@PathVariable Long id, Model model) {
         Paper paper = paperService.findById(id);
+        if (paper == null) return "redirect:/teacher/papers";
         model.addAttribute("paper", paper);
         model.addAttribute("courses", courseService.findByTeacherId(paper.getCreatorId()));
         return "teacher/auto-generate";
@@ -84,7 +88,7 @@ public class PaperController {
 
     @PostMapping("/autoGenerate/{id}")
     public String autoGenerate(@PathVariable Long id,
-                               @RequestParam int singleCount,
+                               @RequestParam(defaultValue = "0") int singleCount,
                                @RequestParam int multiCount,
                                @RequestParam int judgeCount,
                                @RequestParam(defaultValue = "1") int singleScore,
@@ -93,7 +97,7 @@ public class PaperController {
                                @RequestParam(required = false) Integer difficulty,
                                RedirectAttributes ra) {
         Paper paper = paperService.findById(id);
-        List<com.example.demo.entity.Question> allQ = questionService.findByCourseId(paper.getCourseId());
+        List<Question> allQ = questionService.findByCourseId(paper.getCourseId());
 
         // Filter by difficulty if specified
         if (difficulty != null && difficulty > 0) {
@@ -101,10 +105,10 @@ public class PaperController {
         }
 
         // Separate by type
-        java.util.List<com.example.demo.entity.Question> singles = new java.util.ArrayList<>();
-        java.util.List<com.example.demo.entity.Question> multis = new java.util.ArrayList<>();
-        java.util.List<com.example.demo.entity.Question> judges = new java.util.ArrayList<>();
-        for (com.example.demo.entity.Question q : allQ) {
+        List<Question> singles = new ArrayList<>();
+        List<Question> multis = new ArrayList<>();
+        List<Question> judges = new ArrayList<>();
+        for (Question q : allQ) {
             switch (q.getType()) {
                 case "SINGLE": singles.add(q); break;
                 case "MULTI": multis.add(q); break;
@@ -116,25 +120,25 @@ public class PaperController {
         java.util.Collections.shuffle(multis);
         java.util.Collections.shuffle(judges);
 
-        java.util.List<com.example.demo.entity.PaperQuestion> pqs = new java.util.ArrayList<>();
+        List<PaperQuestion> pqs = new ArrayList<>();
         int totalScore = 0;
 
         for (int i = 0; i < Math.min(singleCount, singles.size()); i++) {
-            com.example.demo.entity.PaperQuestion pq = new com.example.demo.entity.PaperQuestion();
+            PaperQuestion pq = new PaperQuestion();
             pq.setQuestionId(singles.get(i).getId());
             pq.setScore(singleScore);
             pqs.add(pq);
             totalScore += singleScore;
         }
         for (int i = 0; i < Math.min(multiCount, multis.size()); i++) {
-            com.example.demo.entity.PaperQuestion pq = new com.example.demo.entity.PaperQuestion();
+            PaperQuestion pq = new PaperQuestion();
             pq.setQuestionId(multis.get(i).getId());
             pq.setScore(multiScore);
             pqs.add(pq);
             totalScore += multiScore;
         }
         for (int i = 0; i < Math.min(judgeCount, judges.size()); i++) {
-            com.example.demo.entity.PaperQuestion pq = new com.example.demo.entity.PaperQuestion();
+            PaperQuestion pq = new PaperQuestion();
             pq.setQuestionId(judges.get(i).getId());
             pq.setScore(judgeScore);
             pqs.add(pq);

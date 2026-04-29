@@ -21,7 +21,7 @@
                         <label class="form-label fw-semibold">授课教师</label>
                         <select name="teacherId" class="form-select">
                             <option value="">请选择教师</option>
-                            <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.realName}" th:selected="${course.teacherId == t.id}"></option>
+                            <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.realName}" th:selected="${course.teacherId != null and course.teacherId == t.id}"></option>
                         </select>
                     </div>
                     <div class="col-12">
