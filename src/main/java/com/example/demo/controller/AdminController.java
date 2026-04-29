@@ -75,8 +75,12 @@ public class AdminController {
 
     @GetMapping("/users/delete/{id}")
     public String userDelete(@PathVariable Long id, RedirectAttributes ra) {
-        userService.delete(id);
-        ra.addFlashAttribute("success", "用户删除成功");
+        try {
+            userService.delete(id);
+            ra.addFlashAttribute("success", "用户删除成功");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "删除失败：该用户可能关联了课程或考试数据");
+        }
         return "redirect:/admin/users";
     }
 }

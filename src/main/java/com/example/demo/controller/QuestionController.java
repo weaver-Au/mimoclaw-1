@@ -69,8 +69,12 @@ public class QuestionController {
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
-        questionService.delete(id);
-        ra.addFlashAttribute("success", "试题删除成功");
+        try {
+            questionService.delete(id);
+            ra.addFlashAttribute("success", "试题删除成功");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "删除失败：该试题可能已关联到试卷");
+        }
         return "redirect:/teacher/questions";
     }
 }

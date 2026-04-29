@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS courses (
   teacher_id BIGINT,
   description TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (teacher_id) REFERENCES users(id)
+  FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Questions table
@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS questions (
   difficulty INT DEFAULT 1,
   creator_id BIGINT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (course_id) REFERENCES courses(id),
-  FOREIGN KEY (creator_id) REFERENCES users(id)
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Papers table
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS papers (
   end_time DATETIME,
   published TINYINT DEFAULT 0,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (course_id) REFERENCES courses(id),
-  FOREIGN KEY (creator_id) REFERENCES users(id)
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Paper-Question association
@@ -81,8 +81,9 @@ CREATE TABLE IF NOT EXISTS student_answers (
   graded TINYINT DEFAULT 0,
   submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (student_id) REFERENCES users(id),
-  FOREIGN KEY (paper_id) REFERENCES papers(id),
-  FOREIGN KEY (question_id) REFERENCES questions(id)
+  FOREIGN KEY (paper_id) REFERENCES papers(id) ON DELETE CASCADE,
+  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
+  UNIQUE KEY uk_student_paper_question (student_id, paper_id, question_id)
 );
 
 -- Insert default admin user

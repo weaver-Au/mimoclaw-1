@@ -28,13 +28,26 @@ public class ExamServiceImpl implements ExamService {
     @Override
     @Transactional
     public boolean submitAnswers(Long studentId, Long paperId, List<StudentAnswer> answers) {
-        // Delete previous answers if resubmitting
-        studentAnswerMapper.deleteByStudentAndPaper(studentId, paperId);
+        // Prevent double submission
+        if (studentAnswerMapper.countByStudentAndPaper(studentId, paperId) > 0) {
+            return false;
+        }
+
+        // Get valid question IDs for this paper
+        java.util.Set<Long> validQuestionIds = new java.util.HashSet<>();
+        for (PaperQuestion pq : paperQuestionMapper.findByPaperId(paperId)) {
+            validQuestionIds.add(pq.getQuestionId());
+        }
 
         for (StudentAnswer sa : answers) {
             sa.setStudentId(studentId);
             sa.setPaperId(paperId);
             sa.setGraded(false);
+
+            // Validate question belongs to this paper
+            if (!validQuestionIds.contains(sa.getQuestionId())) {
+                continue; // Skip invalid question IDs
+            }
 
             // Auto-grade objective questions
             Question question = questionMapper.findById(sa.getQuestionId());

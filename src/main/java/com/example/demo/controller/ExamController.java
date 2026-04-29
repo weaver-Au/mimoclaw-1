@@ -102,7 +102,10 @@ public class ExamController {
             saList.add(sa);
         }
 
-        examService.submitAnswers(user.getId(), paperId, saList);
+        if (!examService.submitAnswers(user.getId(), paperId, saList)) {
+            ra.addFlashAttribute("error", "提交失败，您可能已提交过该试卷");
+            return "redirect:/student/exam/list";
+        }
         ra.addFlashAttribute("success", "试卷提交成功");
         return "redirect:/student/exam/result/" + paperId;
     }

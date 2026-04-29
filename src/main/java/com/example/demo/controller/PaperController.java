@@ -197,8 +197,12 @@ public class PaperController {
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
-        paperService.delete(id);
-        ra.addFlashAttribute("success", "试卷删除成功");
+        try {
+            paperService.delete(id);
+            ra.addFlashAttribute("success", "试卷删除成功");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "删除失败：" + e.getMessage());
+        }
         return "redirect:/teacher/papers";
     }
 }

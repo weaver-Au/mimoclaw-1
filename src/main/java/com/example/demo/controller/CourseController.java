@@ -59,8 +59,12 @@ public class CourseController {
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
-        courseService.delete(id);
-        ra.addFlashAttribute("success", "课程删除成功");
+        try {
+            courseService.delete(id);
+            ra.addFlashAttribute("success", "课程删除成功");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "删除失败：该课程可能关联了试题或试卷");
+        }
         return "redirect:/admin/courses";
     }
 }
