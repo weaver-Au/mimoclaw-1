@@ -8,6 +8,7 @@ public interface UserService {
     boolean register(User user);
     User findById(Long id);
     User findByUsername(String username);
+    User findByPhone(String phone);
     List<User> search(String username, String realName, String role);
     List<User> findAllTeachers();
     List<User> findAll();

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header('手动批改 - 在线考试系统')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<nav th:replace="~{fragments/layout :: teacher-sidebar}"></nav>
+
+<div class="main-content" style="padding-top: 80px;">
+    <h4 class="fw-bold mb-2">手动批改</h4>
+    <p class="text-muted mb-4">试卷：<span th:text="${paper.name}"></span> | 学生ID：<span th:text="${studentId}"></span></p>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle me-1"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="@{/teacher/grading/saveGrade}" method="post">
+        <input type="hidden" name="studentId" th:value="${studentId}">
+        <input type="hidden" name="paperId" th:value="${paper.id}">
+
+        <div class="card mb-3" th:each="a, iter : ${answers}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-bold">
+                        <span class="badge me-2" th:classappend="${a.questionType == 'SINGLE' ? 'bg-primary' : (a.questionType == 'MULTI' ? 'bg-info' : (a.questionType == 'JUDGE' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                              th:text="${a.questionType == 'SINGLE' ? '单选' : (a.questionType == 'MULTI' ? '多选' : (a.questionType == 'JUDGE' ? '判断' : '主观'))}"></span>
+                        第 <span th:text="${iter.index + 1}"></span> 题
+                        <span th:if="${a.graded}" class="badge bg-success ms-2">已批改</span>
+                        <span th:if="${!a.graded}" class="badge bg-danger ms-2">待批改</span>
+                    </h6>
+                    <span class="text-muted" th:text="'满分 ' + ${a.questionScore} + ' 分'"></span>
+                </div>
+                <p th:text="${a.questionContent}"></p>
+                <div class="mb-2">
+                    <small class="text-muted">学生答案：</small>
+                    <div class="p-2 bg-light rounded" th:text="${a.answer ?: '未作答'}"></div>
+                </div>
+                <div th:if="${a.questionType != 'ESSAY'}" class="mb-2">
+                    <small class="text-muted">正确答案：</small>
+                    <span class="text-success fw-semibold" th:text="${a.correctAnswer}"></span>
+                </div>
+
+                <!-- Manual score input for ESSAY questions -->
+                <div th:if="${a.questionType == 'ESSAY' or !a.graded}" class="mt-3">
+                    <input type="hidden" name="answerIds" th:value="${a.id}">
+                    <div class="input-group" style="max-width: 250px;">
+                        <span class="input-group-text">得分</span>
+                        <input type="number" name="scores" class="form-control" th:value="${a.score}" min="0" th:max="${a.questionScore}">
+                        <span class="input-group-text" th:text="'/ ' + ${a.questionScore}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>保存批改</button>
+            <a th:href="@{/teacher/grading/{paperId}/student/{studentId}(paperId=${paper.id},studentId=${studentId})}" class="btn btn-outline-secondary">返回答卷</a>
+        </div>
+    </form>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

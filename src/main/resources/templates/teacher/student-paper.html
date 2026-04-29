@@ -13,10 +13,11 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <h6 class="fw-bold">
-                    <span class="badge me-2" th:classappend="${a.questionType == 'SINGLE' ? 'bg-primary' : (a.questionType == 'MULTI' ? 'bg-info' : 'bg-warning text-dark')}"
-                          th:text="${a.questionType == 'SINGLE' ? '单选' : (a.questionType == 'MULTI' ? '多选' : '判断')}"></span>
+                    <span class="badge me-2" th:classappend="${a.questionType == 'SINGLE' ? 'bg-primary' : (a.questionType == 'MULTI' ? 'bg-info' : (a.questionType == 'JUDGE' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                          th:text="${a.questionType == 'SINGLE' ? '单选' : (a.questionType == 'MULTI' ? '多选' : (a.questionType == 'JUDGE' ? '判断' : '主观'))}"></span>
                     第 <span th:text="${iter.index + 1}"></span> 题
-                    <span class="badge ms-2" th:classappend="${a.isCorrect ? 'bg-success' : 'bg-danger'}" th:text="${a.isCorrect ? '✓ 正确' : '✗ 错误'}"></span>
+                    <span th:if="${a.graded}" class="badge ms-2" th:classappend="${a.isCorrect ? 'bg-success' : 'bg-danger'}" th:text="${a.isCorrect ? '✓ 正确' : '✗ 错误'}"></span>
+                    <span th:if="${!a.graded}" class="badge bg-warning text-dark ms-2">待批改</span>
                 </h6>
                 <span class="fw-bold" th:text="${a.score} + '/' + ${a.questionScore} + '分'"></span>
             </div>
@@ -24,9 +25,10 @@
             <div class="row">
                 <div class="col-md-6">
                     <small class="text-muted">学生答案：</small>
-                    <span th:class="${a.isCorrect ? 'text-success' : 'text-danger'}" th:text="${a.answer ?: '未作答'}" class="fw-semibold"></span>
+                    <div th:if="${a.questionType == 'ESSAY'}" class="p-2 bg-light rounded" th:text="${a.answer ?: '未作答'}"></div>
+                    <span th:if="${a.questionType != 'ESSAY'}" th:class="${a.isCorrect ? 'text-success' : 'text-danger'}" th:text="${a.answer ?: '未作答'}" class="fw-semibold"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6" th:if="${a.questionType != 'ESSAY'}">
                     <small class="text-muted">正确答案：</small>
                     <span class="text-success fw-semibold" th:text="${a.correctAnswer}"></span>
                 </div>
@@ -34,7 +36,8 @@
         </div>
     </div>
 
-    <div class="mt-3">
+    <div class="d-flex gap-2 mt-3">
+        <a th:href="@{/teacher/grading/{paperId}/student/{studentId}/grade(paperId=${paper.id},studentId=${studentId})}" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>手动批改</a>
         <a th:href="@{/teacher/grading/{paperId}(paperId=${paper.id})}" class="btn btn-outline-secondary">返回成绩列表</a>
     </div>
 </div>

@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<style>
+    .anti-cheat-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+    .anti-cheat-overlay.show { display: flex; }
+    .anti-cheat-overlay .content { text-align: center; color: #fff; }
+    .anti-cheat-overlay .content i { font-size: 4rem; color: #ffc107; }
+    .warning-count { position: fixed; top: 70px; right: 20px; z-index: 1060; }
+</style>
 <head th:replace="~{fragments/layout :: header('答题 - 在线考试系统')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: student-navbar}"></nav>
@@ -23,8 +30,8 @@
                         <input type="hidden" name="questionIds" th:value="${pq.question.id}">
                         <div class="d-flex justify-content-between mb-2">
                             <h6 class="fw-bold">
-                                <span class="badge me-2" th:classappend="${pq.question.type == 'SINGLE' ? 'bg-primary' : (pq.question.type == 'MULTI' ? 'bg-info' : 'bg-warning text-dark')}"
-                                      th:text="${pq.question.type == 'SINGLE' ? '单选' : (pq.question.type == 'MULTI' ? '多选' : '判断')}"></span>
+                                <span class="badge me-2" th:classappend="${pq.question.type == 'SINGLE' ? 'bg-primary' : (pq.question.type == 'MULTI' ? 'bg-info' : (pq.question.type == 'JUDGE' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                                      th:text="${pq.question.type == 'SINGLE' ? '单选' : (pq.question.type == 'MULTI' ? '多选' : (pq.question.type == 'JUDGE' ? '判断' : '主观'))}"></span>
                                 第 <span th:text="${iter.index + 1}"></span> 题
                                 <span class="text-muted fw-normal ms-2">(<span th:text="${pq.score}"></span>分)</span>
                             </h6>
@@ -37,6 +44,9 @@
                         <!-- Single choice -->
                         <div th:if="${pq.question.type == 'SINGLE' or pq.question.type == 'MULTI'}">
                             <div class="options-container" th:attr="data-opts=${pq.question.options}, data-qid=${pq.question.id}, data-type=${pq.question.type}"></div>
+                        </div>
+                        <div th:if="${pq.question.type == 'ESSAY'}">
+                            <textarea class="form-control" rows="5" th:name="'answers_' + ${pq.question.id}" placeholder="请输入你的答案..."></textarea>
                         </div>
 
                         <!-- Judge -->
@@ -127,10 +137,15 @@ document.getElementById('examForm').addEventListener('submit', function(e) {
     var form = document.getElementById('examForm');
     questionIds.forEach(function(qid) {
         var radios = document.querySelectorAll('input[name="answers_' + qid + '"]');
+        var textarea = document.querySelector('textarea[name="answers_' + qid + '"]');
         var checked = [];
-        radios.forEach(function(r) {
-            if (r.checked) checked.push(r.value);
-        });
+        if (textarea) {
+            checked.push(textarea.value);
+        } else {
+            radios.forEach(function(r) {
+                if (r.checked) checked.push(r.value);
+            });
+        }
         var hidden = document.createElement('input');
         hidden.type = 'hidden';
         hidden.name = 'answers';
@@ -152,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var opts = [];
         try { opts = JSON.parse(optsStr); } catch(e) {}
         var html = '';
+        if (type === 'ESSAY') return;
         var inputType = type === 'MULTI' ? 'checkbox' : 'radio';
         opts.forEach(function(opt, i) {
             html += '<div class="form-check mb-2"><input class="form-check-input" type="' + inputType + '" name="answers_' + qid + '" value="' + opt + '" id="q' + qid + '_' + i + '"><label class="form-check-label" for="q' + qid + '_' + i + '">' + opt + '</label></div>';
@@ -159,6 +175,41 @@ document.addEventListener('DOMContentLoaded', function() {
         container.innerHTML = html;
     });
 });
+</script>
+<!-- Anti-cheat warning overlay -->
+<div class="anti-cheat-overlay" id="antiCheatOverlay">
+    <div class="content">
+        <i class="bi bi-exclamation-triangle"></i>
+        <h3 class="mt-3">检测到切屏行为！</h3>
+        <p class="mt-2">考试期间禁止切换窗口，累计 <span id="warnCountDisplay">0</span>/3 次警告后将自动交卷。</p>
+        <button class="btn btn-warning btn-lg mt-3" onclick="dismissWarning()">返回考试</button>
+    </div>
+</div>
+<!-- Warning badge -->
+<div class="warning-count" id="warningBadge" style="display:none;">
+    <span class="badge bg-danger fs-6"><i class="bi bi-exclamation-triangle me-1"></i>警告：<span id="warnBadgeCount">0</span>/3</span>
+</div>
+<script>
+var warnCount = 0; var maxWarnings = 3;
+document.addEventListener("visibilitychange", function() { if (document.hidden) { warnCount++; showAntiCheat(); } });
+window.addEventListener("blur", function() { if (warnCount < maxWarnings) { warnCount++; showAntiCheat(); } });
+function showAntiCheat() {
+    document.getElementById("warnCountDisplay").textContent = warnCount;
+    document.getElementById("warnBadgeCount").textContent = warnCount;
+    document.getElementById("warningBadge").style.display = "block";
+    document.getElementById("antiCheatOverlay").classList.add("show");
+    if (warnCount >= maxWarnings) { alert("警告次数已达上限，系统将自动交卷！"); document.getElementById("examForm").submit(); }
+}
+function dismissWarning() { document.getElementById("antiCheatOverlay").classList.remove("show"); }
+document.addEventListener("copy", function(e) { e.preventDefault(); });
+document.addEventListener("paste", function(e) { e.preventDefault(); });
+document.addEventListener("cut", function(e) { e.preventDefault(); });
+document.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+document.addEventListener("keydown", function(e) {
+    if (e.ctrlKey && (e.key === "c" || e.key === "v" || e.key === "a" || e.key === "x")) { e.preventDefault(); }
+    if (e.key === "F12") { e.preventDefault(); }
+});
+document.onselectstart = function() { return false; };
 </script>
 </body>
 </html>

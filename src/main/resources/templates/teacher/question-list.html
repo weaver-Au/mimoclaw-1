@@ -31,6 +31,7 @@
                         <option value="SINGLE" th:selected="${type == 'SINGLE'}">单选题</option>
                         <option value="MULTI" th:selected="${type == 'MULTI'}">多选题</option>
                         <option value="JUDGE" th:selected="${type == 'JUDGE'}">判断题</option>
+                        <option value="ESSAY" th:selected="${type == 'ESSAY'}">主观题</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -64,8 +65,8 @@
                         <td th:text="${q.id}"></td>
                         <td th:text="${q.courseName}"></td>
                         <td>
-                            <span class="badge" th:classappend="${q.type == 'SINGLE' ? 'bg-primary' : (q.type == 'MULTI' ? 'bg-info' : 'bg-warning text-dark')}"
-                                  th:text="${q.type == 'SINGLE' ? '单选' : (q.type == 'MULTI' ? '多选' : '判断')}"></span>
+                            <span class="badge" th:classappend="${q.type == 'SINGLE' ? 'bg-primary' : (q.type == 'MULTI' ? 'bg-info' : (q.type == 'JUDGE' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                                  th:text="${q.type == 'SINGLE' ? '单选' : (q.type == 'MULTI' ? '多选' : (q.type == 'JUDGE' ? '判断' : '主观'))}"></span>
                         </td>
                         <td th:text="${#strings.length(q.content) > 50} ? ${#strings.substring(q.content, 0, 50)} + '...' : ${q.content}"></td>
                         <td>

@@ -13,6 +13,9 @@ public interface UserMapper {
     @Select("SELECT * FROM users WHERE id = #{id}")
     User findById(Long id);
 
+    @Select("SELECT * FROM users WHERE phone = #{phone}")
+    User findByPhone(String phone);
+
     @Select("<script>" +
             "SELECT * FROM users WHERE 1=1 " +
             "<if test='username != null and username != \"\"'>AND username LIKE CONCAT('%',#{username},'%')</if>" +

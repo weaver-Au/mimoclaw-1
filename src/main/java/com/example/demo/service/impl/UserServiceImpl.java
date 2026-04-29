@@ -43,6 +43,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findByPhone(String phone) {
+        return userMapper.findByPhone(phone);
+    }
+
+    @Override
     public List<User> search(String username, String realName, String role) {
         return userMapper.search(username, realName, role);
     }

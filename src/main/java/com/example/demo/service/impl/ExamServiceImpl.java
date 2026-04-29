@@ -63,8 +63,12 @@ public class ExamServiceImpl implements ExamService {
                         sa.setScore(0);
                     }
                     sa.setGraded(true);
+                } else if ("ESSAY".equals(question.getType())) {
+                    // Essay/subjective - needs manual grading by teacher
+                    sa.setIsCorrect(null);
+                    sa.setScore(0);
+                    sa.setGraded(false);
                 } else {
-                    // Essay or other subjective types - need manual grading
                     sa.setIsCorrect(false);
                     sa.setScore(0);
                     sa.setGraded(false);

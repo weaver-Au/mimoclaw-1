@@ -61,4 +61,17 @@ public interface StudentAnswerMapper {
 
     @Select("SELECT COUNT(*) FROM student_answers WHERE student_id = #{studentId} AND paper_id = #{paperId}")
     int countByStudentAndPaper(@Param("studentId") Long studentId, @Param("paperId") Long paperId);
+
+
+    @Select("SELECT sa.*, u.real_name as student_name, q.content as question_content, " +
+            "q.answer as correct_answer, q.type as question_type, pq.score as question_score " +
+            "FROM student_answers sa " +
+            "LEFT JOIN users u ON sa.student_id = u.id " +
+            "LEFT JOIN questions q ON sa.question_id = q.id " +
+            "LEFT JOIN paper_questions pq ON pq.paper_id = sa.paper_id AND pq.question_id = sa.question_id " +
+            "WHERE sa.id = #{id}")
+    StudentAnswer findById(Long id);
+
+    @Update("UPDATE student_answers SET score=#{score}, graded=#{graded}, is_correct=#{isCorrect} WHERE id=#{id}")
+    int updateScore(StudentAnswer sa);
 }

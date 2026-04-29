@@ -26,6 +26,7 @@
                             <option value="SINGLE" th:selected="${question.type == 'SINGLE'}">单选题</option>
                             <option value="MULTI" th:selected="${question.type == 'MULTI'}">多选题</option>
                             <option value="JUDGE" th:selected="${question.type == 'JUDGE'}">判断题</option>
+                            <option value="ESSAY" th:selected="${question.type == 'ESSAY'}">主观题</option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -107,7 +108,7 @@ function onTypeChange() {
     document.getElementById('singleAnswer').style.display = type === 'SINGLE' ? 'block' : 'none';
     document.getElementById('multiAnswer').style.display = type === 'MULTI' ? 'block' : 'none';
     document.getElementById('judgeAnswer').style.display = type === 'JUDGE' ? 'block' : 'none';
-    document.getElementById('optionsSection').style.display = type === 'JUDGE' ? 'none' : 'block';
+    document.getElementById('optionsSection').style.display = (type === 'JUDGE' || type === 'ESSAY') ? 'none' : 'block';
 }
 
 function prepareSubmit() {
@@ -133,6 +134,7 @@ function prepareSubmit() {
     if (type === 'SINGLE') answerInput.value = document.getElementById('singleSelect').value;
     else if (type === 'MULTI') answerInput.value = document.getElementById('multiInput').value;
     else if (type === 'JUDGE') answerInput.value = document.getElementById('judgeSelect').value;
+    else if (type === 'ESSAY') answerInput.value = '';
 }
 
 // Initialize on page load

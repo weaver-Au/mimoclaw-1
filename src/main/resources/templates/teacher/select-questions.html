@@ -41,8 +41,8 @@
                             </td>
                             <td th:text="${q.courseName}"></td>
                             <td>
-                                <span class="badge" th:classappend="${q.type == 'SINGLE' ? 'bg-primary' : (q.type == 'MULTI' ? 'bg-info' : 'bg-warning text-dark')}"
-                                      th:text="${q.type == 'SINGLE' ? '单选' : (q.type == 'MULTI' ? '多选' : '判断')}"></span>
+                                <span class="badge" th:classappend="${q.type == 'SINGLE' ? 'bg-primary' : (q.type == 'MULTI' ? 'bg-info' : (q.type == 'JUDGE' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                                      th:text="${q.type == 'SINGLE' ? '单选' : (q.type == 'MULTI' ? '多选' : (q.type == 'JUDGE' ? '判断' : '主观'))}"></span>
                             </td>
                             <td th:text="${#strings.length(q.content) > 60} ? ${#strings.substring(q.content, 0, 60)} + '...' : ${q.content}"></td>
                             <td>
@@ -62,6 +62,7 @@
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>保存组卷</button>
+            <a th:href="@{/teacher/papers/autoGenerate/{id}(id=${paper.id})}" class="btn btn-outline-info"><i class="bi bi-magic me-1"></i>自动组卷</a>
             <a th:href="@{/teacher/papers}" class="btn btn-outline-secondary">返回列表</a>
         </div>
     </form>

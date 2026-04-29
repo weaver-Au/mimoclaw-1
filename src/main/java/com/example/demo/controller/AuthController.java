@@ -5,7 +5,6 @@ import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -21,20 +20,52 @@ public class AuthController {
     }
 
     @PostMapping("/doLogin")
-    public String doLogin(@RequestParam String username,
-                          @RequestParam String password,
-                          @RequestParam String role,
+    public String doLogin(@RequestParam String role,
+                          @RequestParam(required = false) String loginType,
+                          @RequestParam(required = false) String username,
+                          @RequestParam(required = false) String password,
+                          @RequestParam(required = false) String phone,
+                          @RequestParam(required = false) String verifyCode,
                           HttpSession session,
                           RedirectAttributes ra) {
-        User user = userService.login(username, password);
-        if (user == null) {
-            ra.addFlashAttribute("error", "用户名或密码错误");
-            return "redirect:/login";
+        User user = null;
+
+        if ("phone".equals(loginType)) {
+            // Phone login: verify code (hardcoded "123456" for demo)
+            if (phone == null || phone.isEmpty()) {
+                ra.addFlashAttribute("error", "请输入手机号");
+                return "redirect:/login";
+            }
+            if (!"123456".equals(verifyCode)) {
+                ra.addFlashAttribute("error", "验证码错误");
+                return "redirect:/login";
+            }
+            user = userService.findByPhone(phone);
+            if (user == null) {
+                ra.addFlashAttribute("error", "该手机号未注册");
+                return "redirect:/login";
+            }
+            if (!user.getRole().equals(role)) {
+                ra.addFlashAttribute("error", "角色不匹配");
+                return "redirect:/login";
+            }
+        } else {
+            // Password login
+            if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
+                ra.addFlashAttribute("error", "请输入用户名和密码");
+                return "redirect:/login";
+            }
+            user = userService.login(username, password);
+            if (user == null) {
+                ra.addFlashAttribute("error", "用户名或密码错误");
+                return "redirect:/login";
+            }
+            if (!user.getRole().equals(role)) {
+                ra.addFlashAttribute("error", "角色不匹配，请选择正确的角色");
+                return "redirect:/login";
+            }
         }
-        if (!user.getRole().equals(role)) {
-            ra.addFlashAttribute("error", "角色不匹配，请选择正确的角色");
-            return "redirect:/login";
-        }
+
         session.setAttribute("loginUser", user);
         switch (user.getRole()) {
             case "ADMIN": return "redirect:/admin/dashboard";
@@ -89,5 +120,3 @@ public class AuthController {
         }
     }
 }
-
-// Teacher and Student dashboard - added as supplementary

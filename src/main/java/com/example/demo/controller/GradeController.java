@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import com.example.demo.mapper.StudentAnswerMapper;
+
 @Controller
 public class GradeController {
 
@@ -27,6 +29,9 @@ public class GradeController {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private StudentAnswerMapper studentAnswerMapper;
 
     // ========== Student grade viewing ==========
     @GetMapping("/student/grades")
@@ -97,7 +102,38 @@ public class GradeController {
         model.addAttribute("answers", answers);
         model.addAttribute("paper", paper);
         model.addAttribute("totalScore", totalScore);
+        model.addAttribute("studentId", studentId);
         return "teacher/student-paper";
+    }
+
+    // ========== Manual Grading (for essay questions) ==========
+    @GetMapping("/teacher/grading/{paperId}/student/{studentId}/grade")
+    public String manualGradeForm(@PathVariable Long paperId, @PathVariable Long studentId, Model model) {
+        List<StudentAnswer> answers = gradeService.getAnswersByStudentAndPaper(studentId, paperId);
+        Paper paper = paperService.findById(paperId);
+        model.addAttribute("answers", answers);
+        model.addAttribute("paper", paper);
+        model.addAttribute("studentId", studentId);
+        return "teacher/manual-grade";
+    }
+
+    @PostMapping("/teacher/grading/saveGrade")
+    public String saveGrade(@RequestParam Long studentId,
+                            @RequestParam Long paperId,
+                            @RequestParam Long[] answerIds,
+                            @RequestParam Integer[] scores,
+                            RedirectAttributes ra) {
+        for (int i = 0; i < answerIds.length; i++) {
+            StudentAnswer sa = studentAnswerMapper.findById(answerIds[i]);
+            if (sa != null) {
+                sa.setScore(scores[i]);
+                sa.setGraded(true);
+                sa.setIsCorrect(scores[i] > 0);
+                studentAnswerMapper.updateScore(sa);
+            }
+        }
+        ra.addFlashAttribute("success", "批改完成");
+        return "redirect:/teacher/grading/" + paperId + "/student/" + studentId;
     }
 
     // ========== Admin grade viewing ==========
