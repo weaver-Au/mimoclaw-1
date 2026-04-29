@@ -201,7 +201,7 @@ public class PaperController {
             paperService.delete(id);
             ra.addFlashAttribute("success", "试卷删除成功");
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "删除失败：" + e.getMessage());
+            ra.addFlashAttribute("error", "删除失败：该试卷可能有关联数据");
         }
         return "redirect:/teacher/papers";
     }

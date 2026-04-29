@@ -20,7 +20,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">密码 <span th:if="${user.id == null}" class="text-danger">*</span><span th:if="${user.id != null}" class="text-muted">(留空不修改)</span></label>
-                        <input type="password" name="password" class="form-control" th:value="${user.password}">
+                        <input type="password" name="password" class="form-control" placeholder="留空则不修改">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">真实姓名 <span class="text-danger">*</span></label>
