@@ -61,12 +61,22 @@ public class AdminController {
     @PostMapping("/users/save")
     public String userSave(User user, RedirectAttributes ra) {
         if (user.getId() == null) {
+            // New user - password is required
+            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                ra.addFlashAttribute("error", "新用户必须设置密码");
+                return "redirect:/admin/users/add";
+            }
             if (userService.save(user)) {
                 ra.addFlashAttribute("success", "用户添加成功");
             } else {
                 ra.addFlashAttribute("error", "用户名已存在");
             }
         } else {
+            // Existing user - if password is empty, keep old password
+            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                User existing = userService.findById(user.getId());
+                user.setPassword(existing.getPassword());
+            }
             userService.update(user);
             ra.addFlashAttribute("success", "用户更新成功");
         }
@@ -74,7 +84,12 @@ public class AdminController {
     }
 
     @GetMapping("/users/delete/{id}")
-    public String userDelete(@PathVariable Long id, RedirectAttributes ra) {
+    public String userDelete(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User currentUser = (User) session.getAttribute("loginUser");
+        if (currentUser.getId().equals(id)) {
+            ra.addFlashAttribute("error", "不能删除当前登录的用户");
+            return "redirect:/admin/users";
+        }
         try {
             userService.delete(id);
             ra.addFlashAttribute("success", "用户删除成功");

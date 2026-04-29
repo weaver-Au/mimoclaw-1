@@ -89,10 +89,24 @@ public class AuthController {
                              @RequestParam(required = false) String phone,
                              @RequestParam(required = false) String className,
                              RedirectAttributes ra) {
+        // Input validation
+        if (username == null || username.trim().length() < 3 || username.trim().length() > 50) {
+            ra.addFlashAttribute("error", "用户名长度需要3-50个字符");
+            return "redirect:/register";
+        }
+        if (password == null || password.length() < 6 || password.length() > 100) {
+            ra.addFlashAttribute("error", "密码长度需要6-100个字符");
+            return "redirect:/register";
+        }
+        if (realName == null || realName.trim().isEmpty() || realName.trim().length() > 50) {
+            ra.addFlashAttribute("error", "请输入真实姓名（不超过50个字符）");
+            return "redirect:/register";
+        }
+
         User user = new User();
-        user.setUsername(username);
+        user.setUsername(username.trim());
         user.setPassword(password);
-        user.setRealName(realName);
+        user.setRealName(realName.trim());
         user.setPhone(phone);
         user.setClassName(className);
         user.setRole("STUDENT");

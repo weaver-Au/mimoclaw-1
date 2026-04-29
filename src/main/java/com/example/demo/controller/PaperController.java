@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Paper;
-import PaperQuestion;
-import Question;
+import com.example.demo.entity.PaperQuestion;
+import com.example.demo.entity.Question;
 import com.example.demo.entity.User;
 import com.example.demo.service.CourseService;
 import com.example.demo.service.PaperService;
@@ -67,7 +67,7 @@ public class PaperController {
         model.addAttribute("paper", paper);
         model.addAttribute("allQuestions", questionService.findByCourseId(paper.getCourseId()));
         // Build a map of questionId -> score for existing paper questions
-        java.util.Map<Long, Integer> selectedScores = new HashMap<>()();
+        java.util.Map<Long, Integer> selectedScores = new HashMap<>();
         if (paper.getPaperQuestions() != null) {
             for (PaperQuestion pq : paper.getPaperQuestions()) {
                 selectedScores.put(pq.getQuestionId(), pq.getScore());
